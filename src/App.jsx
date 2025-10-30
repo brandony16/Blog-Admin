@@ -1,10 +1,13 @@
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route
         path="/"
         element={
@@ -13,7 +16,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/login" element={<Login />} />
     </Routes>
   );
 }
