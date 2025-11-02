@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import Home from "./pages/Home.jsx";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <div>Home Page</div>
+            <Home />
           </ProtectedRoute>
         }
       />

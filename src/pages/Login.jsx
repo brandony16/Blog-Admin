@@ -12,7 +12,8 @@ const Login = () => {
     const password = formData.get("password");
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      setErrors([]);
+      const res = await fetch("http://localhost:3000/api/auth/login-admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -23,7 +24,7 @@ const Login = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrors(data.errors);
+        setErrors([data.message]);
       } else {
         login(data.user, data.token);
         window.location.href = "/";
@@ -43,7 +44,7 @@ const Login = () => {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl text-left">
             <ul className="list-disc list-inside space-y-1">
               {errors.map((err, i) => (
-                <li key={i}>{err.msg}</li>
+                <li key={i}>{err}</li>
               ))}
             </ul>
           </div>
