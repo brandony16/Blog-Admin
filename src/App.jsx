@@ -2,7 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
-import Home from "./pages/Home.jsx";
+import AdminLayout from "./pages/AdminLayout.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 
 function App() {
   return (
@@ -13,10 +14,16 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <Home />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="my-articles" element={<Dashboard />} />
+        <Route path="create-article" element={<Dashboard />} />
+        <Route path="manage-users" element={<Dashboard />} />
+        <Route path="settings" element={<Dashboard />} />
+      </Route>
     </Routes>
   );
 }

@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
-import Dashboard from "../components/Dashboard.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import Header from "../components/Header.jsx";
+import { Outlet } from "react-router-dom";
 
-const Home = () => {
+const AdminLayout = () => {
   const { user } = useContext(AuthContext);
 
   if (!user) {
@@ -16,10 +16,10 @@ const Home = () => {
       <Sidebar />
       <main className="flex flex-1 flex-col">
         <Header />
-        <Dashboard />
+        <Outlet />
       </main>
     </div>
   );
 };
 
-export default Home;
+export default AdminLayout;
