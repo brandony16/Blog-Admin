@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
-import Navbar from "../components/Navbar.jsx";
 import Dashboard from "../components/Dashboard.jsx";
 import Sidebar from "../components/Sidebar.jsx";
+import Header from "../components/Header.jsx";
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -12,12 +12,12 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <div className="flex flex-1">
-        <Sidebar />
+    <div className="flex flex-1 min-h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex flex-1 flex-col">
+        <Header />
         <Dashboard />
-      </div>
+      </main>
     </div>
   );
 };
