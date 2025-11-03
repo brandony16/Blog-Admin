@@ -1,9 +1,11 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const { login } = useContext(AuthContext);
   const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
 
   const inputStyle =
     "bg-white/90 text-gray-800 placeholder-gray-500 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500";
@@ -37,7 +39,7 @@ const Signup = () => {
         setErrors(data.errors);
       } else {
         login(data.user, data.token);
-        window.location.href = "/";
+        navigate("/");
       }
     } catch (err) {
       console.error(err);
@@ -124,12 +126,12 @@ const Signup = () => {
 
         <p className="text-black text-sm font-medium">
           Already have an account?{" "}
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="underline text-orange-600 hover:text-orange-800"
           >
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

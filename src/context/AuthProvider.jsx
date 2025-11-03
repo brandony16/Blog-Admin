@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // On page load, check if user info is stored
@@ -27,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setToken(null);
+    navigate("/login");
   };
 
   return (

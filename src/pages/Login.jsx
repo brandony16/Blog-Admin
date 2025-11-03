@@ -1,9 +1,11 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
   const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ const Login = () => {
         setErrors([data.message]);
       } else {
         login(data.user, data.token);
-        window.location.href = "/";
+        navigate("/");
       }
     } catch (err) {
       console.error(err);
@@ -74,12 +76,12 @@ const Login = () => {
 
         <p className="text-black text-sm font-medium">
           No account?{" "}
-          <a
-            href="/signup"
+          <Link
+            to="/signup"
             className="underline text-orange-600 hover:text-orange-800"
           >
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
