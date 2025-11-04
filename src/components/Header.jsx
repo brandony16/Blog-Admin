@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
+import bnbLogo from "../assets/BnB_logo.png";
 
 const Header = () => {
   const { user } = useContext(AuthContext);
@@ -8,7 +9,10 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 bg-white shadow-sm flex justify-between items-center px-8 py-4">
-      <h1 className="text-2xl font-bold text-blue-700">Dashboard Overview</h1>
+      <h1 className="text-2xl font-bold text-blue-700 flex gap-2 justify-start items-center">
+        <img src={bnbLogo} alt="Bits & Breakpoints" className="w-6 h-6" />
+        Bits & Breakpoints
+      </h1>
       <div className="flex items-center gap-4">
         <p className="font-medium">
           {user.firstName} {user.lastName}

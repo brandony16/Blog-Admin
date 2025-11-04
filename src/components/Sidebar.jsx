@@ -9,7 +9,6 @@ import {
 import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx";
-import bnbLogo from "../assets/BnB_logo.png";
 
 const Sidebar = () => {
   const { logout } = useContext(AuthContext);
@@ -26,7 +25,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-linear-to-b from-blue-600 to-blue-900 text-white flex flex-col">
       <div className="px-6 py-4 text-2xl font-bold border-b border-blue-600 flex gap-2 items-center justify-start">
-        <img src={bnbLogo} alt="Bits & Breakpoints" className="w-6 h-6" />Admin Panel
+        Admin Panel
       </div>
       <nav className="flex flex-col gap-2 p-4 text-sm font-medium">
         <NavLink to="/" className={({ isActive }) => getLinkClasses(isActive)}>

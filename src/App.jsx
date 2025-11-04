@@ -4,6 +4,7 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import AdminLayout from "./pages/AdminLayout.jsx";
 import Dashboard from "./components/Dashboard.jsx";
+import MyArticles from "./pages/MyArticles.jsx";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="my-articles" element={<Dashboard />} />
+        <Route path="my-articles" element={<MyArticles />} />
         <Route path="create-article" element={<Dashboard />} />
         <Route path="manage-users" element={<Dashboard />} />
         <Route path="settings" element={<Dashboard />} />
