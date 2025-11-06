@@ -33,7 +33,7 @@ const CreateArticle = () => {
           setErrors(data.errors);
         }
       } else {
-        alert(res.message);
+        alert(data.message); 
       }
     } catch (err) {
       console.error(err);
@@ -61,6 +61,8 @@ const CreateArticle = () => {
           onChange={(e) => setTitle(e.target.value)}
           name="title"
           required
+          minLength={1}
+          maxLength={50}
         />
 
         <textarea
@@ -69,7 +71,11 @@ const CreateArticle = () => {
           onChange={(e) => setBody(e.target.value)}
           name="body"
           required
+          minLength={10}
         />
+        <p className="italic text-gray-600 self-end">
+          Characters: {body.length}
+        </p>
         {errors.length > 0 && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl text-left">
             <ul className="list-disc list-inside space-y-1">

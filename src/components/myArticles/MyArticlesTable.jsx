@@ -1,49 +1,40 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
+import { AuthContext } from "../../context/AuthContext.jsx";
 
 const MyArticlesTable = () => {
+  const { user } = useContext(AuthContext);
   const [articles, setArticles] = useState([]);
   const [sortColumn, setSortColumn] = useState("lastUpdated");
   const [sortDirection, setSortDirection] = useState("desc");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [articlesPerPage, setArticlesPerPage] = useState(10);
 
-  // Simulated fetch — replace with API call
   useEffect(() => {
-    setArticles([
-      {
-        id: 1,
-        title: "Understanding React Context",
-        body: "lorem ipsum",
-        createdAt: new Date("Oct 17, 2025"),
-        publishedAt: new Date("Oct 20, 2025"),
-        editedAt: null,
-      },
-      {
-        id: 2,
-        title: "Building a Node API with Prisma",
-        body: "lorem ipsum",
-        createdAt: new Date("Oct 18, 2025"),
-        publishedAt: null,
-        editedAt: null,
-      },
-      {
-        id: 3,
-        title: "Introduction to Git for version control",
-        body: "lorem ipsum",
-        createdAt: new Date("Oct 18, 2025"),
-        publishedAt: new Date("Oct 26, 2025"),
-        editedAt: new Date("Nov 1 2025"),
-      },
-      {
-        id: 4,
-        title: "How to set up a React app with Vite",
-        body: "lorem ipsum",
-        createdAt: new Date("Nov 2 2025"),
-        publishedAt: new Date("Nov 2, 2025"),
-        editedAt: null,
-      },
-    ]);
-  }, []);
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/users/${user.id}/articles`
+        );
+
+        const data = await res.json();
+        console.log(data);
+        if (!res.ok) {
+          console.error(res);
+        }
+        setArticles(data.articles);
+        setPage(data.page);
+        setTotalPages(data.totalPages);
+        setArticlesPerPage(data.limit);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchArticles();
+  }, [user.id]);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -57,7 +48,8 @@ const MyArticlesTable = () => {
   const getDateStringFromArticle = (article) => {
     const mostRecentDate =
       article.editedAt || article.publishedAt || article.createdAt;
-    return mostRecentDate.toLocaleDateString();
+    const date = new Date(mostRecentDate);
+    return date.toLocaleDateString();
   };
 
   const sortedArticles = useMemo(() => {
@@ -129,6 +121,13 @@ const MyArticlesTable = () => {
       {articles.length === 0 && (
         <div className="p-6 text-center text-gray-500">
           No articles yet. Create one above!
+        </div>
+      )}
+      {articles.length !== 0 && (
+        <div className="flex justify-center items-center p-2 border-t-2 border-t-orange-600">
+          <p>
+            Page {page} of {totalPages}
+          </p>
         </div>
       )}
     </div>
