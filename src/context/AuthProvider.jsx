@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -8,12 +9,16 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // On page load, check if user info is stored
-    const storedUser = localStorage.getItem("user");
+    // On page load, check if user token is stored and if it is valid
     const storedToken = localStorage.getItem("token");
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+
+    if (storedToken && isTokenValid(storedToken)) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setUser(user);
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
     }
   }, []);
 
@@ -30,6 +35,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     navigate("/login");
+  };
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+
+    try {
+      const decoded = jwtDecode(token);
+      const now = Date.now() / 1000;
+      return decoded.exp > now;
+    } catch (err) {
+      return false;
+    }
   };
 
   return (
