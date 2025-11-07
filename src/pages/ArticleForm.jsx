@@ -1,12 +1,12 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
-import { jwtDecode } from "jwt-decode";
 import Alert from "../components/Alert.jsx";
+import { useParams } from "react-router-dom";
 
-const CreateArticle = () => {
+const ArticleForm = ({ mode = "create" }) => {
+  const { id } = useParams();
   const { token } = useContext(AuthContext);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [article, setArticle] = useState({ title: "", body: "" });
   const [saveType, setSaveType] = useState("Draft");
   const [errors, setErrors] = useState([]);
   const [notif, setNotif] = useState(null);
@@ -14,8 +14,6 @@ const CreateArticle = () => {
   const handleSave = async () => {
     try {
       setErrors([]);
-      console.log(token);
-      console.log(jwtDecode(token));
       const res = await fetch("http://localhost:3000/api/articles/", {
         method: "POST",
         headers: {
@@ -23,8 +21,8 @@ const CreateArticle = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title,
-          body,
+          title: article.title,
+          body: article.body,
           publishArticle: saveType === "Publish",
         }),
       });
@@ -33,28 +31,38 @@ const CreateArticle = () => {
 
       if (!res.ok) {
         if (res.status === 403 || res.status === 401) {
-          setErrors([{ msg: data.message }]);
+          setNotif({ message: data.message, type: "error" });
         } else {
           setErrors(data.errors);
         }
       } else {
-        setTitle("");
-        setBody("");
+        setArticle({ title: "", body: "" });
         setSaveType("");
-        setNotif(data.message);
+        setNotif({ message: data.message, type: "success" });
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  useEffect(() => {
+    const getArticle = async () => {
+      const res = await fetch(`/api/articles/${id}`);
+    };
+    if (mode === "edit" && id) {
+      getArticle();
+    }
+  });
+
   return (
     <div className="p-8 flex flex-col gap-6 max-w-[1200px]">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-blue-800">Create New Article</h1>
+        <h1 className="text-3xl font-bold text-blue-800">
+          {mode === "create" ? "Create New Article" : "Edit Article"}
+        </h1>
         <div className="flex gap-3">
           <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition cursor-pointer">
-            Save Draft
+            Save As Draft
           </button>
           <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition cursor-pointer">
             Publish
@@ -66,8 +74,12 @@ const CreateArticle = () => {
           type="text"
           placeholder="Article Title"
           className="text-2xl font-semibold border-b-2 border-gray-200 focus:border-blue-500 outline-none p-2"
-          onChange={(e) => setTitle(e.target.value)}
-          value={title}
+          onChange={(e) =>
+            setArticle((prev) => {
+              return { ...prev, title: e.target.value };
+            })
+          }
+          value={article.title}
           name="title"
           required
           minLength={1}
@@ -77,14 +89,18 @@ const CreateArticle = () => {
         <textarea
           placeholder="Write your article content here..."
           className="min-h-[400px] border border-gray-200 rounded-lg p-4 focus:border-blue-500 outline-none resize-y"
-          onChange={(e) => setBody(e.target.value)}
-          value={body}
+          onChange={(e) =>
+            setArticle((prev) => {
+              return { ...prev, body: e.target.value };
+            })
+          }
+          value={article.body}
           name="body"
           required
           minLength={10}
         />
         <p className="italic text-gray-600 self-end">
-          Characters: {body.length}
+          Characters: {article.body.length}
         </p>
         {errors.length > 0 && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl text-left">
@@ -115,7 +131,7 @@ const CreateArticle = () => {
       </div>
       {notif && (
         <Alert
-          message={notif}
+          message={notif.message}
           type={notif.type}
           onClose={() => setNotif(null)}
         />
@@ -124,4 +140,4 @@ const CreateArticle = () => {
   );
 };
 
-export default CreateArticle;
+export default ArticleForm;

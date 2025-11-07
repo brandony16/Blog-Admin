@@ -5,7 +5,7 @@ import Signup from "./pages/Signup.jsx";
 import AdminLayout from "./pages/AdminLayout.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import MyArticles from "./pages/MyArticles.jsx";
-import CreateArticle from "./pages/CreateArticle.jsx";
+import ArticleForm from "./pages/ArticleForm.jsx";
 
 function App() {
   return (
@@ -22,7 +22,8 @@ function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="my-articles" element={<MyArticles />} />
-        <Route path="create-article" element={<CreateArticle />} />
+        <Route path="create-article" element={<ArticleForm />} />
+        <Route path="edit-article/:id" element={<ArticleForm />} />
         <Route path="manage-users" element={<Dashboard />} />
         <Route path="settings" element={<Dashboard />} />
       </Route>

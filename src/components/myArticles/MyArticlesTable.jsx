@@ -3,9 +3,10 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import PageInfo from "./PageInfo.jsx";
+import Alert from "../Alert.jsx";
 
 const MyArticlesTable = () => {
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [articles, setArticles] = useState([]);
   const [sortColumn, setSortColumn] = useState("lastUpdated");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -13,6 +14,7 @@ const MyArticlesTable = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [articlesPerPage, setArticlesPerPage] = useState(10);
   const [totalArticles, setTotalArticles] = useState(0);
+  const [notif, setNotif] = useState(null);
 
   const fetchArticles = useCallback(
     async (page) => {
@@ -23,7 +25,7 @@ const MyArticlesTable = () => {
 
         const data = await res.json();
         if (!res.ok) {
-          console.error(res);
+          throw new Error(data.message || "Error fetching articles. Try Again");
         }
         setArticles(data.articles);
         setPage(data.page);
@@ -31,7 +33,7 @@ const MyArticlesTable = () => {
         setArticlesPerPage(data.limit);
         setTotalArticles(data.total);
       } catch (err) {
-        console.error(err);
+        setNotif({ message: err.message, type: "error" });
       }
     },
     [user.id, sortColumn, sortDirection]
@@ -40,6 +42,32 @@ const MyArticlesTable = () => {
   useEffect(() => {
     fetchArticles(page);
   }, [fetchArticles, page]);
+
+  const handleDelete = async (id, title) => {
+    if (!window.confirm(`Delete article: "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/articles/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to delete. Try again");
+      }
+      setNotif({ message: data.message, type: "success" });
+      fetchArticles(page);
+    } catch (err) {
+      setNotif({ message: err.message, type: "error" });
+    }
+  };
+
+  const handleEdit = async (id) => {};
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -97,10 +125,16 @@ const MyArticlesTable = () => {
                 {getDateStringFromArticle(article)}
               </td>
               <td className="p-4 text-center">
-                <button className="text-blue-600 hover:text-blue-800 mr-3 cursor-pointer">
+                <button
+                  onClick={() => handleEdit(article.id)}
+                  className="text-blue-600 hover:text-blue-800 mr-3 cursor-pointer"
+                >
                   <Pencil size={18} />
                 </button>
-                <button className="text-red-600 hover:text-red-800 cursor-pointer">
+                <button
+                  onClick={() => handleDelete(article.id, article.title)}
+                  className="text-red-600 hover:text-red-800 cursor-pointer"
+                >
                   <Trash2 size={18} />
                 </button>
               </td>
@@ -121,6 +155,13 @@ const MyArticlesTable = () => {
           totalArticles={totalArticles}
           getPageRange={getPageRange}
           setPage={setPage}
+        />
+      )}
+      {notif && (
+        <Alert
+          message={notif.message}
+          type={notif.type}
+          onClose={() => setNotif(null)}
         />
       )}
     </div>
