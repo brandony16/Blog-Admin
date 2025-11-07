@@ -1,7 +1,8 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
+import PageInfo from "./PageInfo.jsx";
 
 const MyArticlesTable = () => {
   const { user } = useContext(AuthContext);
@@ -13,11 +14,11 @@ const MyArticlesTable = () => {
   const [articlesPerPage, setArticlesPerPage] = useState(10);
   const [totalArticles, setTotalArticles] = useState(0);
 
-  useEffect(() => {
-    const fetchArticles = async () => {
+  const fetchArticles = useCallback(
+    async (page, sort, sortOrder) => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/users/${user.id}/articles`
+          `http://localhost:3000/api/users/${user.id}/articles?page=${page}&sort=${sort}&order=${sortOrder}`
         );
 
         const data = await res.json();
@@ -32,10 +33,13 @@ const MyArticlesTable = () => {
       } catch (err) {
         console.error(err);
       }
-    };
+    },
+    [user.id]
+  );
 
-    fetchArticles();
-  }, [user.id]);
+  useEffect(() => {
+    fetchArticles(page, sortColumn, sortDirection);
+  }, [fetchArticles, page, sortColumn, sortDirection]);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -47,35 +51,14 @@ const MyArticlesTable = () => {
   };
 
   const getDateStringFromArticle = (article) => {
-    const mostRecentDate =
-      article.editedAt || article.publishedAt || article.createdAt;
+    const mostRecentDate = Math.max(
+      new Date(article.editedAt || 0).getTime(),
+      new Date(article.publishedAt || 0).getTime(),
+      new Date(article.createdAt || 0).getTime()
+    );
     const date = new Date(mostRecentDate);
     return date.toLocaleDateString();
   };
-
-  const sortedArticles = useMemo(() => {
-    return [...articles].sort((a, b) => {
-      if (sortColumn === "status") {
-        const aStatus = a.publishedAt === null ? 0 : 1;
-        const bStatus = b.publishedAt === null ? 0 : 1;
-
-        return sortDirection === "asc" ? aStatus - bStatus : bStatus - aStatus;
-      }
-
-      let aVal, bVal;
-      if (sortColumn === "title") {
-        aVal = a[sortColumn];
-        bVal = b[sortColumn];
-      } else {
-        aVal = a.editedAt || a.publishedAt || a.createdAt;
-        bVal = b.editedAt || b.publishedAt || b.createdAt;
-      }
-
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-  }, [articles, sortColumn, sortDirection]);
 
   const getPageRange = () => {
     const start = articlesPerPage * (page - 1) + 1;
@@ -93,7 +76,7 @@ const MyArticlesTable = () => {
           sortDirection={sortDirection}
         />
         <tbody>
-          {sortedArticles.map((article) => (
+          {articles.map((article) => (
             <tr
               key={article.id}
               className="border-t hover:bg-blue-50 transition"
@@ -132,20 +115,13 @@ const MyArticlesTable = () => {
         </div>
       )}
       {articles.length !== 0 && (
-        <div className="relative flex justify-center items-center py-3 px-6 border-t-2 border-t-orange-600">
-          <p className="font-medium">
-            Page {page} of {totalPages}
-          </p>
-
-          <p className="absolute right-6 text-gray-500">
-            Showing{" "}
-            <span className="font-semibold text-gray-800">
-              {getPageRange()}
-            </span>{" "}
-            of{" "}
-            <span className="font-semibold text-gray-800">{totalArticles}</span>
-          </p>
-        </div>
+        <PageInfo
+          page={page}
+          totalPages={totalPages}
+          totalArticles={totalArticles}
+          getPageRange={getPageRange}
+          fetchArticles={fetchArticles}
+        />
       )}
     </div>
   );

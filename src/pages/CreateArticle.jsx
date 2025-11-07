@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { jwtDecode } from "jwt-decode";
+import Alert from "../components/Alert.jsx";
 
 const CreateArticle = () => {
   const { token } = useContext(AuthContext);
@@ -113,8 +114,8 @@ const CreateArticle = () => {
         </div>
       </div>
       {notif && (
-        <Notification
-          message={notif.message}
+        <Alert
+          message={notif}
           type={notif.type}
           onClose={() => setNotif(null)}
         />
