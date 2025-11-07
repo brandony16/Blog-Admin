@@ -14,10 +14,12 @@ export const AuthProvider = ({ children }) => {
 
     if (storedToken && isTokenValid(storedToken)) {
       const user = JSON.parse(localStorage.getItem("user"));
+      setToken(storedToken);
       setUser(user);
     } else {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      setToken(null);
       setUser(null);
     }
   }, []);

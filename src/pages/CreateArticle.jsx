@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
+import { jwtDecode } from "jwt-decode";
 
 const CreateArticle = () => {
   const { token } = useContext(AuthContext);
@@ -7,10 +8,13 @@ const CreateArticle = () => {
   const [body, setBody] = useState("");
   const [saveType, setSaveType] = useState("Draft");
   const [errors, setErrors] = useState([]);
+  const [notif, setNotif] = useState(null);
 
   const handleSave = async () => {
     try {
       setErrors([]);
+      console.log(token);
+      console.log(jwtDecode(token));
       const res = await fetch("http://localhost:3000/api/articles/", {
         method: "POST",
         headers: {
@@ -27,13 +31,16 @@ const CreateArticle = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        if (res.status === 403) {
+        if (res.status === 403 || res.status === 401) {
           setErrors([{ msg: data.message }]);
         } else {
           setErrors(data.errors);
         }
       } else {
-        alert(data.message); 
+        setTitle("");
+        setBody("");
+        setSaveType("");
+        setNotif(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -59,6 +66,7 @@ const CreateArticle = () => {
           placeholder="Article Title"
           className="text-2xl font-semibold border-b-2 border-gray-200 focus:border-blue-500 outline-none p-2"
           onChange={(e) => setTitle(e.target.value)}
+          value={title}
           name="title"
           required
           minLength={1}
@@ -69,6 +77,7 @@ const CreateArticle = () => {
           placeholder="Write your article content here..."
           className="min-h-[400px] border border-gray-200 rounded-lg p-4 focus:border-blue-500 outline-none resize-y"
           onChange={(e) => setBody(e.target.value)}
+          value={body}
           name="body"
           required
           minLength={10}
@@ -90,6 +99,7 @@ const CreateArticle = () => {
             name="saveType"
             className="border border-gray-200 rounded-lg px-3 py-2 w-40 focus:border-blue-500 outline-none"
             onChange={(e) => setSaveType(e.target.value)}
+            value={saveType}
           >
             <option>Draft</option>
             <option>Publish</option>
@@ -102,6 +112,13 @@ const CreateArticle = () => {
           </button>
         </div>
       </div>
+      {notif && (
+        <Notification
+          message={notif.message}
+          type={notif.type}
+          onClose={() => setNotif(null)}
+        />
+      )}
     </div>
   );
 };

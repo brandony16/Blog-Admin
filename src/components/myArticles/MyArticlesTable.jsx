@@ -11,6 +11,7 @@ const MyArticlesTable = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [articlesPerPage, setArticlesPerPage] = useState(10);
+  const [totalArticles, setTotalArticles] = useState(0);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -20,7 +21,6 @@ const MyArticlesTable = () => {
         );
 
         const data = await res.json();
-        console.log(data);
         if (!res.ok) {
           console.error(res);
         }
@@ -28,6 +28,7 @@ const MyArticlesTable = () => {
         setPage(data.page);
         setTotalPages(data.totalPages);
         setArticlesPerPage(data.limit);
+        setTotalArticles(data.total);
       } catch (err) {
         console.error(err);
       }
@@ -75,6 +76,13 @@ const MyArticlesTable = () => {
       return 0;
     });
   }, [articles, sortColumn, sortDirection]);
+
+  const getPageRange = () => {
+    const start = articlesPerPage * (page - 1) + 1;
+    const end =
+      page === totalPages ? totalArticles : start + articlesPerPage - 1;
+    return `${start}-${end}`;
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -124,9 +132,18 @@ const MyArticlesTable = () => {
         </div>
       )}
       {articles.length !== 0 && (
-        <div className="flex justify-center items-center p-2 border-t-2 border-t-orange-600">
-          <p>
+        <div className="relative flex justify-center items-center py-3 px-6 border-t-2 border-t-orange-600">
+          <p className="font-medium">
             Page {page} of {totalPages}
+          </p>
+
+          <p className="absolute right-6 text-gray-500">
+            Showing{" "}
+            <span className="font-semibold text-gray-800">
+              {getPageRange()}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-gray-800">{totalArticles}</span>
           </p>
         </div>
       )}
