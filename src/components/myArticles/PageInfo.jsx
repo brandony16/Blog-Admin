@@ -5,7 +5,7 @@ const PageInfo = ({
   totalPages,
   totalArticles,
   getPageRange,
-  fetchArticles,
+  setPage,
 }) => {
   return (
     <div className="relative flex justify-center items-center py-3 px-6 border-t-2 border-t-orange-600">
@@ -17,7 +17,7 @@ const PageInfo = ({
           }`}
           onClick={() => {
             if (page === 1) return;
-            fetchArticles(page - 1);
+            setPage((page) => page - 1);
           }}
         />
         <p className="font-medium">
@@ -30,7 +30,7 @@ const PageInfo = ({
           }`}
           onClick={() => {
             if (page === totalPages) return;
-            fetchArticles(page + 1);
+            setPage((page) => page + 1);
           }}
         />
       </div>

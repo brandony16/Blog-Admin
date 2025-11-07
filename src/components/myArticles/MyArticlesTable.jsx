@@ -15,10 +15,10 @@ const MyArticlesTable = () => {
   const [totalArticles, setTotalArticles] = useState(0);
 
   const fetchArticles = useCallback(
-    async (page, sort, sortOrder) => {
+    async (page) => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/users/${user.id}/articles?page=${page}&sort=${sort}&order=${sortOrder}`
+          `http://localhost:3000/api/users/${user.id}/articles?page=${page}&sort=${sortColumn}&order=${sortDirection}`
         );
 
         const data = await res.json();
@@ -34,12 +34,12 @@ const MyArticlesTable = () => {
         console.error(err);
       }
     },
-    [user.id]
+    [user.id, sortColumn, sortDirection]
   );
 
   useEffect(() => {
-    fetchArticles(page, sortColumn, sortDirection);
-  }, [fetchArticles, page, sortColumn, sortDirection]);
+    fetchArticles(page);
+  }, [fetchArticles, page]);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -120,7 +120,7 @@ const MyArticlesTable = () => {
           totalPages={totalPages}
           totalArticles={totalArticles}
           getPageRange={getPageRange}
-          fetchArticles={fetchArticles}
+          setPage={setPage}
         />
       )}
     </div>
