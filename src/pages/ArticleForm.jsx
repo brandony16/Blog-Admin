@@ -2,10 +2,11 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 import { NotificationContext } from "../context/NotificationContext.jsx";
-import { getArticleById, saveArticle } from "../utils/articleApi.jsx";
+import { getArticleById, saveArticle } from "../utils/articleApi.js";
 import ArticleInputs from "../components/articleForm/ArticleInputs.jsx";
 import ErrorList from "../components/articleForm/ErrorList.jsx";
 import SaveControls from "../components/articleForm/SaveControls.jsx";
+import { addActivity, ACTIVITY_TYPES } from "../utils/activity.js";
 
 const ArticleForm = ({ mode = "create" }) => {
   const { id } = useParams();
@@ -36,7 +37,12 @@ const ArticleForm = ({ mode = "create" }) => {
       if (data.errors) return setErrors(data.errors);
       showNotification(data.message, "success");
       setArticle({ title: "", body: "" });
-      if (mode === "edit") navigate("/my-articles");
+      if (mode === "edit") {
+        addActivity(`Edited article: ${article.title}`, ACTIVITY_TYPES.EDIT);
+        navigate("/my-articles");
+      } else {
+        addActivity(`Created article: ${article.title}`, ACTIVITY_TYPES.CREATE);
+      }
     } catch (err) {
       showNotification(err.message, "error");
     }

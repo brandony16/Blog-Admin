@@ -1,12 +1,12 @@
-import { Pencil, Trash2 } from "lucide-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import PageInfo from "./PageInfo.jsx";
 import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
-import { deleteArticle, fetchUserArticles } from "../../utils/articleApi.jsx";
+import { deleteArticle, fetchUserArticles } from "../../utils/articleApi.js";
 import ArticleRow from "./ArticleRow.jsx";
+import { ACTIVITY_TYPES, addActivity } from "../../utils/activity.js";
 
 const MyArticlesTable = () => {
   const { user, token } = useContext(AuthContext);
@@ -53,6 +53,7 @@ const MyArticlesTable = () => {
     try {
       const data = await deleteArticle(id, token);
       showNotification(data.message, "success");
+      addActivity(`Deleted article: "${title}"`, ACTIVITY_TYPES.DELETE);
       loadArticles();
     } catch (err) {
       showNotification(err.message, "error");

@@ -3,7 +3,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import AdminLayout from "./pages/AdminLayout.jsx";
-import Dashboard from "./components/Dashboard.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import MyArticles from "./pages/MyArticles.jsx";
 import ArticleForm from "./pages/ArticleForm.jsx";
 import { NotificationProvider } from "./context/NotificationProvider.jsx";
