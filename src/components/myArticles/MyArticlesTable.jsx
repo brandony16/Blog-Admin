@@ -3,96 +3,69 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import PageInfo from "./PageInfo.jsx";
-import Alert from "../Alert.jsx";
+import { useNavigate } from "react-router-dom";
+import { NotificationContext } from "../../context/NotificationContext.jsx";
+import { deleteArticle, fetchUserArticles } from "../../utils/articleApi.jsx";
+import ArticleRow from "./ArticleRow.jsx";
 
 const MyArticlesTable = () => {
   const { user, token } = useContext(AuthContext);
+  const { showNotification } = useContext(NotificationContext);
+  const navigate = useNavigate();
+
   const [articles, setArticles] = useState([]);
   const [sortColumn, setSortColumn] = useState("lastUpdated");
   const [sortDirection, setSortDirection] = useState("desc");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [articlesPerPage, setArticlesPerPage] = useState(10);
-  const [totalArticles, setTotalArticles] = useState(0);
-  const [notif, setNotif] = useState(null);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalArticles: 0,
+    articlesPerPage: 10,
+  });
 
-  const fetchArticles = useCallback(
-    async (page) => {
-      try {
-        const res = await fetch(
-          `http://localhost:3000/api/users/${user.id}/articles?page=${page}&sort=${sortColumn}&order=${sortDirection}`
-        );
-
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || "Error fetching articles. Try Again");
-        }
-        setArticles(data.articles);
-        setPage(data.page);
-        setTotalPages(data.totalPages);
-        setArticlesPerPage(data.limit);
-        setTotalArticles(data.total);
-      } catch (err) {
-        setNotif({ message: err.message, type: "error" });
-      }
-    },
-    [user.id, sortColumn, sortDirection]
-  );
+  const loadArticles = useCallback(async () => {
+    try {
+      const data = await fetchUserArticles({
+        userId: user.id,
+        page,
+        sort: sortColumn,
+        order: sortDirection,
+      });
+      setArticles(data.articles);
+      setPagination({
+        totalPages: data.totalPages,
+        totalArticles: data.total,
+        articlesPerPage: data.limit,
+      });
+    } catch (err) {
+      showNotification(err.message, "error");
+    }
+  }, [user.id, page, sortColumn, sortDirection, showNotification]);
 
   useEffect(() => {
-    fetchArticles(page);
-  }, [fetchArticles, page]);
+    loadArticles();
+  }, [loadArticles]);
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Delete article: "${title}"?`)) return;
+    const confirm = window.confirm(`Delete article: "${title}"?`);
+    if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/articles/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to delete. Try again");
-      }
-      setNotif({ message: data.message, type: "success" });
-      fetchArticles(page);
+      const data = await deleteArticle(id, token);
+      showNotification(data.message, "success");
+      loadArticles();
     } catch (err) {
-      setNotif({ message: err.message, type: "error" });
+      showNotification(err.message, "error");
     }
   };
 
-  const handleEdit = async (id) => {};
+  const handleEdit = (id) => navigate(`/edit-article/${id}`);
 
   const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  };
-
-  const getDateStringFromArticle = (article) => {
-    const mostRecentDate = Math.max(
-      new Date(article.editedAt || 0).getTime(),
-      new Date(article.publishedAt || 0).getTime(),
-      new Date(article.createdAt || 0).getTime()
+    setSortColumn((prev) => (prev === column ? column : column));
+    setSortDirection((prev) =>
+      sortColumn === column && prev === "asc" ? "desc" : "asc"
     );
-    const date = new Date(mostRecentDate);
-    return date.toLocaleDateString();
-  };
-
-  const getPageRange = () => {
-    const start = articlesPerPage * (page - 1) + 1;
-    const end =
-      page === totalPages ? totalArticles : start + articlesPerPage - 1;
-    return `${start}-${end}`;
   };
 
   return (
@@ -105,40 +78,12 @@ const MyArticlesTable = () => {
         />
         <tbody>
           {articles.map((article) => (
-            <tr
+            <ArticleRow
               key={article.id}
-              className="border-t hover:bg-blue-50 transition"
-            >
-              <td className="p-4 font-medium">{article.title}</td>
-              <td className="p-4">
-                <span
-                  className={`px-2 py-1 rounded-full text-sm ${
-                    article.publishedAt !== null
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {article.publishedAt === null ? "Draft" : "Published"}
-                </span>
-              </td>
-              <td className="p-4 text-gray-600">
-                {getDateStringFromArticle(article)}
-              </td>
-              <td className="p-4 text-center">
-                <button
-                  onClick={() => handleEdit(article.id)}
-                  className="text-blue-600 hover:text-blue-800 mr-3 cursor-pointer"
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(article.id, article.title)}
-                  className="text-red-600 hover:text-red-800 cursor-pointer"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </td>
-            </tr>
+              article={article}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </tbody>
       </table>
@@ -151,17 +96,10 @@ const MyArticlesTable = () => {
       {articles.length !== 0 && (
         <PageInfo
           page={page}
-          totalPages={totalPages}
-          totalArticles={totalArticles}
-          getPageRange={getPageRange}
-          setPage={setPage}
-        />
-      )}
-      {notif && (
-        <Alert
-          message={notif.message}
-          type={notif.type}
-          onClose={() => setNotif(null)}
+          totalPages={pagination.totalPages}
+          totalArticles={pagination.totalArticles}
+          articlesPerPage={pagination.articlesPerPage}
+          onPageChange={setPage}
         />
       )}
     </div>

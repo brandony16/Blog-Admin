@@ -4,41 +4,43 @@ const PageInfo = ({
   page,
   totalPages,
   totalArticles,
-  getPageRange,
-  setPage,
+  articlesPerPage,
+  onPageChange,
 }) => {
-  return (
-    <div className="relative flex justify-center items-center py-3 px-6 border-t-2 border-t-orange-600">
-      <div className="flex gap-2 items-center justify-center">
-        <Triangle
-          size={15}
-          className={`rotate-270 cursor-pointer ${
-            page === 1 ? "" : "fill-orange-400"
-          }`}
-          onClick={() => {
-            if (page === 1) return;
-            setPage((page) => page - 1);
-          }}
-        />
-        <p className="font-medium">
-          Page {page} of {totalPages}
-        </p>
-        <Triangle
-          size={15}
-          className={`rotate-90 cursor-pointer ${
-            page === totalPages ? "" : "fill-orange-400"
-          }`}
-          onClick={() => {
-            if (page === totalPages) return;
-            setPage((page) => page + 1);
-          }}
-        />
-      </div>
+  const start = articlesPerPage * (page - 1) + 1;
+  const end = page === totalPages ? totalArticles : start + articlesPerPage - 1;
 
-      <p className="absolute right-6 text-gray-500">
-        Showing{" "}
-        <span className="font-semibold text-gray-800">{getPageRange()}</span> of{" "}
-        <span className="font-semibold text-gray-800">{totalArticles}</span>
+  return (
+    <div className="flex justify-center items-center p-4 border-t-orange-600 border-t-2 relative">
+      <div className="flex gap-2 justify-center items-center">
+        <button
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+          className="px-3 py-1 border rounded-lg disabled:opacity-50 cursor-pointer"
+        >
+          <Triangle
+            size={15}
+            className={`rotate-270 ${page === 1 ? "" : "fill-orange-600"}`}
+          />
+        </button>
+        <span className="text-gray-700 text-sm">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+          className="px-3 py-1 border rounded-lg disabled:opacity-50 cursor-pointer"
+        >
+          <Triangle
+            size={15}
+            className={`rotate-90 ${
+              page === totalPages ? "" : "fill-orange-600"
+            }`}
+          />
+        </button>
+      </div>
+      <p className="absolute right-6 text-gray-600 text-sm">
+        Showing {start}-{end} of {totalArticles}
       </p>
     </div>
   );

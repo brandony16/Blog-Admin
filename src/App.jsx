@@ -6,6 +6,7 @@ import AdminLayout from "./pages/AdminLayout.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import MyArticles from "./pages/MyArticles.jsx";
 import ArticleForm from "./pages/ArticleForm.jsx";
+import { NotificationProvider } from "./context/NotificationProvider.jsx";
 
 function App() {
   return (
@@ -16,14 +17,16 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <AdminLayout />
+            <NotificationProvider>
+              <AdminLayout />
+            </NotificationProvider>
           </ProtectedRoute>
         }
       >
         <Route index element={<Dashboard />} />
         <Route path="my-articles" element={<MyArticles />} />
-        <Route path="create-article" element={<ArticleForm />} />
-        <Route path="edit-article/:id" element={<ArticleForm />} />
+        <Route path="create-article" element={<ArticleForm mode="create" />} />
+        <Route path="edit-article/:id" element={<ArticleForm mode="edit" />} />
         <Route path="manage-users" element={<Dashboard />} />
         <Route path="settings" element={<Dashboard />} />
       </Route>
