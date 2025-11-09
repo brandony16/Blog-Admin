@@ -1,45 +1,58 @@
 import SortingArrows from "../SortingArrows.jsx";
 
-const ArticleTableHeaders = ({ handleSort, sortColumn, sortDirection }) => {
+const UserTableHeader = ({ handleSort, sortColumn, sortDirection }) => {
   return (
     <thead className="bg-blue-100 text-blue-800">
       <tr>
         <th>
           <div
-            onClick={() => handleSort("title")}
+            onClick={() => handleSort("name")}
             className="p-4 flex gap-2 items-center cursor-pointer w-fit select-none"
           >
-            Title{" "}
+            Name{" "}
             <SortingArrows
               sortColumn={sortColumn}
               sortDirection={sortDirection}
-              columnName={"title"}
+              columnName={"name"}
             />
           </div>
         </th>
         <th>
           <div
-            onClick={() => handleSort("status")}
+            onClick={() => handleSort("email")}
             className="p-4 flex gap-2 items-center cursor-pointer w-fit select-none"
           >
-            Status{" "}
+            Email{" "}
             <SortingArrows
               sortColumn={sortColumn}
               sortDirection={sortDirection}
-              columnName={"status"}
+              columnName={"email"}
             />
           </div>
         </th>
         <th>
           <div
-            onClick={() => handleSort("lastUpdated")}
+            onClick={() => handleSort("role")}
             className="p-4 flex gap-2 items-center cursor-pointer w-fit select-none"
           >
-            Last Updated{" "}
+            Role{" "}
             <SortingArrows
               sortColumn={sortColumn}
               sortDirection={sortDirection}
-              columnName={"lastUpdated"}
+              columnName={"role"}
+            />
+          </div>
+        </th>
+        <th>
+          <div
+            onClick={() => handleSort("created")}
+            className="p-4 flex gap-2 items-center cursor-pointer w-fit select-none"
+          >
+            Created{" "}
+            <SortingArrows
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              columnName={"created"}
             />
           </div>
         </th>
@@ -49,4 +62,4 @@ const ArticleTableHeaders = ({ handleSort, sortColumn, sortDirection }) => {
   );
 };
 
-export default ArticleTableHeaders;
+export default UserTableHeader;

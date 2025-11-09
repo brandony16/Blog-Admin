@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import ArticleTableHeaders from "./ArticlesTableHeaders.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
-import PageInfo from "./PageInfo.jsx";
+import PageInfo from "../PageInfo.jsx";
 import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
 import { deleteArticle, fetchUserArticles } from "../../utils/articleApi.js";
@@ -98,8 +98,8 @@ const MyArticlesTable = () => {
         <PageInfo
           page={page}
           totalPages={pagination.totalPages}
-          totalArticles={pagination.totalArticles}
-          articlesPerPage={pagination.articlesPerPage}
+          totalEntries={pagination.totalArticles}
+          entriesPerPage={pagination.articlesPerPage}
           onPageChange={setPage}
         />
       )}

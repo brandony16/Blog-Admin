@@ -3,12 +3,12 @@ import { Triangle } from "lucide-react";
 const PageInfo = ({
   page,
   totalPages,
-  totalArticles,
-  articlesPerPage,
+  totalEntries,
+  entriesPerPage,
   onPageChange,
 }) => {
-  const start = articlesPerPage * (page - 1) + 1;
-  const end = page === totalPages ? totalArticles : start + articlesPerPage - 1;
+  const start = entriesPerPage * (page - 1) + 1;
+  const end = page === totalPages ? totalEntries : start + entriesPerPage - 1;
 
   return (
     <div className="flex justify-center items-center p-4 border-t-orange-600 border-t-2 relative">
@@ -40,7 +40,7 @@ const PageInfo = ({
         </button>
       </div>
       <p className="absolute right-6 text-gray-600 text-sm">
-        Showing {start}-{end} of {totalArticles}
+        Showing {start}-{end} of {totalEntries}
       </p>
     </div>
   );

@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import MyArticles from "./pages/MyArticles.jsx";
 import ArticleForm from "./pages/ArticleForm.jsx";
 import { NotificationProvider } from "./context/NotificationProvider.jsx";
+import ManageUsers from "./pages/ManageUsers.jsx";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
         <Route path="my-articles" element={<MyArticles />} />
         <Route path="create-article" element={<ArticleForm mode="create" />} />
         <Route path="edit-article/:id" element={<ArticleForm mode="edit" />} />
-        <Route path="manage-users" element={<Dashboard />} />
+        <Route path="manage-users" element={<ManageUsers />} />
         <Route path="settings" element={<Dashboard />} />
       </Route>
     </Routes>
