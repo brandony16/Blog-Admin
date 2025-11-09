@@ -2,16 +2,17 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import UserTableHeader from "./UserTableHeader.jsx";
 import UserRow from "./UserRow.jsx";
 import PageInfo from "../PageInfo.jsx";
-import { fetchUsers } from "../../utils/userApi.js";
+import { deleteUser, fetchUsers } from "../../utils/userApi.js";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
+import { addActivity } from "../../utils/activity.js";
 
 const UserTable = () => {
   const { token } = useContext(AuthContext);
   const { showNotification } = useContext(NotificationContext);
 
   const [users, setUsers] = useState([]);
-  const [sortColumn, setSortColumn] = useState("lastUpdated");
+  const [sortColumn, setSortColumn] = useState("created");
   const [sortDirection, setSortDirection] = useState("desc");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
@@ -43,7 +44,19 @@ const UserTable = () => {
     loadUsers();
   }, [loadUsers]);
 
-  const handleDelete = () => {
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(`Delete user? This is not reversible.`);
+    if (!confirm) return;
+
+    try {
+      const data = await deleteUser(id, token);
+      showNotification(data.message, "success");
+      addActivity(`Deleted user: ${data.user.firstName} ${data.user.lastName}`);
+      loadUsers();
+    } catch (err) {
+      showNotification(err.message, "error");
+    }
+
     return;
   };
 
