@@ -24,3 +24,16 @@ export const deleteUser = async (id, token) => {
   if (!res.ok) throw new Error(data.message || "Delete failed");
   return data;
 };
+
+export const promoteUser = async (id, token) => {
+  const res = await fetch(`http://localhost:3000/api/users/${id}/promote`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Delete failed");
+  return data;
+};

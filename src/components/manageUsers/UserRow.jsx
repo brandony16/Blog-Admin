@@ -1,6 +1,6 @@
-import { Trash2 } from "lucide-react";
+import { ShieldCheck, Trash2 } from "lucide-react";
 
-const UserRow = ({ user, onDelete }) => {
+const UserRow = ({ user, onDelete, onPromote }) => {
   return (
     <tr className="border-t hover:bg-blue-50 transition">
       <td className="p-4 font-medium">{`${user.firstName} ${user.lastName}`}</td>
@@ -16,6 +16,14 @@ const UserRow = ({ user, onDelete }) => {
         >
           <Trash2 size={18} />
         </button>
+        {user.role !== "ADMIN" && (
+          <button
+            onClick={() => onPromote(user.id)}
+            className="text-red-600 hover:text-red-800 cursor-pointer"
+          >
+            <ShieldCheck size={18} />
+          </button>
+        )}
       </td>
     </tr>
   );

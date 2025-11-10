@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import UserTableHeader from "./UserTableHeader.jsx";
 import UserRow from "./UserRow.jsx";
 import PageInfo from "../PageInfo.jsx";
-import { deleteUser, fetchUsers } from "../../utils/userApi.js";
+import { deleteUser, fetchUsers, promoteUser } from "../../utils/userApi.js";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import { addActivity } from "../../utils/activity.js";
@@ -56,8 +56,20 @@ const UserTable = () => {
     } catch (err) {
       showNotification(err.message, "error");
     }
+  };
 
-    return;
+  const handlePromote = async (id) => {
+    const confirm = window.confirm(`Delete user? This is not reversible.`);
+    if (!confirm) return;
+
+    try {
+      const data = await promoteUser(id, token);
+      showNotification(data.message, "success");
+      addActivity(`Deleted user: ${data.user.firstName} ${data.user.lastName}`);
+      loadUsers();
+    } catch (err) {
+      showNotification(err.message, "error");
+    }
   };
 
   const handleSort = (column) => {
@@ -77,7 +89,12 @@ const UserTable = () => {
         />
         <tbody>
           {users.map((user) => (
-            <UserRow key={user.id} user={user} onDelete={handleDelete} />
+            <UserRow
+              key={user.id}
+              user={user}
+              onDelete={handleDelete}
+              onPromote={handlePromote}
+            />
           ))}
         </tbody>
       </table>
