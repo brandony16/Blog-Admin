@@ -18,7 +18,7 @@ const Header = () => {
           {user.firstName} {user.lastName}
         </p>
         <img
-          src="https://api.dicebear.com/9.x/thumbs/svg?seed=Admin&scale=90&backgroundColor=FF7700,FFBB44&backgroundType=gradientLinear&eyes=variant4W12&faceOffsetX=0,0&shapeColor=0055FF"
+          src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${user.id}&faceOffsetX=0,0`}
           alt="avatar"
           className="w-10 h-10 rounded-full border-2 border-blue-500"
         />
