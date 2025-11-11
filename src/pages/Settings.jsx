@@ -32,7 +32,6 @@ const Settings = () => {
       });
       const data = await res.json();
       if (!res.ok) {
-        console.log(data.errors);
         throw new Error(data.message || "Update failed");
       }
 
