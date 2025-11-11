@@ -1,15 +1,24 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { NotificationContext } from "../context/NotificationContext";
-import { Trash, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import EditName from "../components/settings/EditName.jsx";
+import DisplayName from "../components/settings/DisplayName.jsx";
+import { deleteUser } from "../utils/userApi.js";
+import { addActivity } from "../utils/activity.js";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
-  const { user, token, setUser } = useContext(AuthContext);
+  const { user, token, setUser, logout } = useContext(AuthContext);
   const { showNotification } = useContext(NotificationContext);
-  const [name, setName] = useState(user.name);
+  const navigate = useNavigate();
+
+  const [editing, setEditing] = useState(false);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -19,13 +28,17 @@ const Settings = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ firstName, lastName }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Update failed");
+      if (!res.ok) {
+        console.log(data.errors);
+        throw new Error(data.message || "Update failed");
+      }
 
-      setUser((prev) => ({ ...prev, name }));
+      setUser((prev) => ({ ...prev, firstName, lastName }));
       showNotification("Name updated successfully", "success");
+      setEditing(false);
     } catch (err) {
       showNotification(err.message, "error");
     } finally {
@@ -33,8 +46,27 @@ const Settings = () => {
     }
   };
 
+  const handleDelete = async () => {
+    const confirm = window.confirm(`Delete user? This is not reversible.`);
+    if (!confirm) return;
+
+    try {
+      const data = await deleteUser(user.id, token);
+      addActivity(`Deleted user: ${data.user.firstName} ${data.user.lastName}`);
+      logout();
+      navigate("/login");
+    } catch (err) {
+      showNotification(err.message, "error");
+    }
+  };
+  const handleCancel = () => {
+    setEditing(false);
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+  };
+
   return (
-    <div className="p-8 bg-linear-to-br from-blue-50 to-orange-50 flex flex-col gap-8">
+    <div className="p-8 bg-linear-to-br from-blue-50 to-orange-50 flex flex-col gap-8 h-1/1">
       <header className="text-start">
         <h1 className="text-4xl font-bold text-blue-700">Settings</h1>
       </header>
@@ -46,9 +78,19 @@ const Settings = () => {
             alt={`${user.firstName} ${user.lastName} avatar`}
             className="w-28 h-28 rounded-full border-2 border-blue-500 shadow-md"
           />
-          <h2 className="text-3xl font-semibold text-gray-800">
-            {user.firstName} {user.lastName}
-          </h2>
+          {editing ? (
+            <EditName
+              firstName={firstName}
+              lastName={lastName}
+              setFirstName={setFirstName}
+              setLastName={setLastName}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              isLoading={loading}
+            />
+          ) : (
+            <DisplayName user={user} setEditing={setEditing} />
+          )}
         </div>
 
         <dl className="flex flex-col gap-5 text-lg text-gray-700">
@@ -70,7 +112,10 @@ const Settings = () => {
           </div>
         </dl>
 
-        <button className="flex items-center gap-2 text-lg border-2 border-red-400 rounded-xl px-4 py-2 text-red-700 bg-red-100 hover:bg-red-200 transition">
+        <button
+          className="flex items-center gap-2 text-lg border-2 border-red-400 rounded-xl px-4 py-2 text-red-700 bg-red-100 hover:bg-red-200 transition cursor-pointer"
+          onClick={() => handleDelete()}
+        >
           <Trash2 className="w-5 h-5" />
           <span>Delete Account</span>
         </button>

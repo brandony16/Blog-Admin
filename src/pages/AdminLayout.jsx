@@ -14,7 +14,7 @@ const AdminLayout = () => {
   return (
     <div className="flex flex-1 min-h-screen bg-gray-50">
       <Sidebar />
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col min-h-screen">
         <Header />
         <Outlet />
       </main>
