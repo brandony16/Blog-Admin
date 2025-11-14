@@ -52,7 +52,7 @@ const ArticleForm = ({ mode = "create" }) => {
     if (mode !== "edit" || !id) return;
     setLoading(true);
     try {
-      const data = await getArticleById(id);
+      const data = await getArticleById(id, token);
       setArticle(data.article);
       setSaveType(data.article.publishedAt ? "Publish" : "Draft");
     } catch (err) {
@@ -60,7 +60,7 @@ const ArticleForm = ({ mode = "create" }) => {
     } finally {
       setLoading(false);
     }
-  }, [id, mode, showNotification]);
+  }, [id, mode, showNotification, token]);
 
   useEffect(() => {
     fetchArticle();
