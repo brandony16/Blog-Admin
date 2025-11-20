@@ -120,7 +120,7 @@ const Signup = () => {
             type="submit"
             className="bg-blue-700 hover:bg-blue-800 transition-all duration-200 rounded-xl py-3 text-white font-semibold shadow-md hover:shadow-lg cursor-pointer"
           >
-            Log In
+            Sign Up
           </button>
         </form>
 
