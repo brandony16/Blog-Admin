@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { NotificationContext } from "../context/NotificationContext";
-import { Trash2 } from "lucide-react";
+import { LoaderCircle, Trash2 } from "lucide-react";
 import EditName from "../components/settings/EditName.jsx";
 import DisplayName from "../components/settings/DisplayName.jsx";
 import { deleteUser } from "../utils/userApi.js";
@@ -14,9 +14,16 @@ const Settings = () => {
   const navigate = useNavigate();
 
   const [editing, setEditing] = useState(false);
-  const [firstName, setFirstName] = useState(user.firstName);
-  const [lastName, setLastName] = useState(user.lastName);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+    }
+  }, [user]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -63,6 +70,8 @@ const Settings = () => {
     setFirstName(user.firstName);
     setLastName(user.lastName);
   };
+
+  if (!user) return <LoaderCircle />;
 
   return (
     <div className="p-8 bg-linear-to-br from-blue-50 to-orange-50 flex flex-col gap-8 h-1/1">
